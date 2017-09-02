@@ -1,0 +1,15 @@
+# sbt specific
+dist/*
+target/
+boot/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+.scala_dependencies
+.tags*
+.sublime*
+.atom*
+.ensime*
+.idea*
