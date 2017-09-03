@@ -13,3 +13,9 @@ scalacOptions ++= Seq(
   "-feature",
   "-Xlint"
 )
+
+scriptedBufferLog := false
+scriptedLaunchOpts ++= Seq(
+  "-Xmx1024M",
+  "-Dplugin.version=" + version.value
+)

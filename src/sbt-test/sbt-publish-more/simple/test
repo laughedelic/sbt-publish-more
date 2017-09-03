@@ -1,0 +1,6 @@
+> clean
+> publish
+$ exists target/repo1/org/simple_2.12/1/simple_2.12-1.pom
+$ exists target/repo1/org/simple_2.12/1/simple_2.12-1.jar
+$ exists target/repo2/org/simple_2.12/1/simple_2.12-1.pom
+$ exists target/repo2/org/simple_2.12/1/simple_2.12-1.jar
