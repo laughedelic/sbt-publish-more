@@ -8,7 +8,7 @@ case object PublishMore extends AutoPlugin {
 
   case object autoImport {
 
-    lazy val publishConfigs = taskKey[Map[Resolver, PublishConfiguration]]("A set of resolvers with their correcponding publish configurations")
+    lazy val publishConfigs = taskKey[Map[Resolver, PublishConfiguration]]("A set of resolvers with their corresponding publish configurations")
 
     // This adds Resolver.chain(...) constructor
     implicit def resolverObjOps(resolver: Resolver.type):
