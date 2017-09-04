@@ -1,6 +1,6 @@
 package laughedelic.sbt
 
-import sbt._, Keys._
+import sbt._, Keys._, complete._, DefaultParsers._
 
 case object PublishMore extends AutoPlugin {
 
@@ -9,6 +9,9 @@ case object PublishMore extends AutoPlugin {
   case object autoImport {
 
     lazy val publishConfigs = taskKey[Map[Resolver, PublishConfiguration]]("A set of resolvers with their corresponding publish configurations")
+
+    lazy val publishOnlyTo = inputKey[Unit]("Publishes only to the specified repository")
+
 
     // This adds Resolver.chain(...) constructor
     implicit def resolverObjOps(resolver: Resolver.type):
@@ -35,7 +38,9 @@ case object PublishMore extends AutoPlugin {
 
     publish := Def.taskDyn {
       publishWithConfigs( publishConfigs.value )
-    }.value
+    }.value,
+
+    publishOnlyTo := publishOnlyToTask.evaluated
   )
 
   def publishWithConfigs(configsMap: Map[Resolver, PublishConfiguration]): Def.Initialize[Task[Unit]] = Def.task {
@@ -55,6 +60,29 @@ case object PublishMore extends AutoPlugin {
     }
   }
 
+  def publishOnlyToTask: Def.Initialize[InputTask[Unit]] = Def.inputTask {
+    val configsMap = resolversByName.parsed
+    val log = streams.value.log
+    configsMap.keys.foreach { resolver => log.warn(resolver.name) }
+
+    // publishWithConfigs(configsMap)
+  }
+
+  // def resolverNameParser(resolvers: Seq[Resolver]): Def.Initialize[Parser[Resolver]] = Def.task {
+  def resolversByName: Def.Initialize[
+    State => Parser[Map[Resolver, PublishConfiguration]]
+  ] = Def.setting { state: State =>
+    val (_, configsMap) = Project.extract(state).runTask(publishConfigs, state)
+
+    val parseResolver = oneOf(
+      configsMap.toSeq.map { case (resolver, config) =>
+        token(resolver.name) ^^^ ((resolver, config))
+      }
+    )
+
+    Space ~> rep1sep(parseResolver, Space).map(_.toMap)
+  }
+
   /** Extracts chained resolvers or just wraps a single one as a Seq */
   def resolverAsSeq(resolver: Resolver): Seq[Resolver] = resolver match {
     case chain: ChainedResolver => chain.resolvers
@@ -69,5 +97,4 @@ case object PublishMore extends AutoPlugin {
         resolvers.toVector
       )
   }
-
 }
