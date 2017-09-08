@@ -61,26 +61,35 @@ case object PublishMore extends AutoPlugin {
   }
 
   def publishOnlyToTask: Def.Initialize[InputTask[Unit]] = Def.inputTask {
-    val configsMap = resolversByName.parsed
+    val resolvers = resolversByName.parsed
     val log = streams.value.log
-    configsMap.keys.foreach { resolver => log.warn(resolver.name) }
+    resolvers.foreach { resolver => log.warn(resolver.toString) }
 
+    // TODO
     // publishWithConfigs(configsMap)
   }
 
-  // def resolverNameParser(resolvers: Seq[Resolver]): Def.Initialize[Parser[Resolver]] = Def.task {
   def resolversByName: Def.Initialize[
-    State => Parser[Map[Resolver, PublishConfiguration]]
+    State => Parser[Seq[Resolver]]
   ] = Def.setting { state: State =>
-    val (_, configsMap) = Project.extract(state).runTask(publishConfigs, state)
+    val (_, publishToValue) = Project.extract(state).runTask(publishTo, state)
+    val resolvers = publishToValue.toSeq.flatMap(resolverAsSeq)
 
-    val parseResolver = oneOf(
-      configsMap.toSeq.map { case (resolver, config) =>
-        token(resolver.name) ^^^ ((resolver, config))
-      }
-    )
+    def resolverParser(resolver: Resolver): Parser[Resolver] = {
+      tokenDisplay(
+        resolver.name ^^^ resolver,
+        s"* ${resolver.name}: ${resolver.toString}"
+      )
+    }
 
-    Space ~> rep1sep(parseResolver, Space).map(_.toMap)
+    def chooseNext(chosen: Seq[Resolver]): Parser[Resolver] = {
+      val rest = resolvers diff chosen
+      if (rest.isEmpty) failure("None left!")
+      // it seems that oneOf fails with an exception on an empty Seq "/
+      else oneOf( rest.map(resolverParser) )
+    }
+
+    Space ~> repeatDep(chooseNext, Space)
   }
 
   /** Extracts chained resolvers or just wraps a single one as a Seq */
