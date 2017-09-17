@@ -12,6 +12,10 @@ developers := List(Developer(
   s"${laughedelic}@gmail.com",
   url(s"https://github.com/${laughedelic}")
 ))
+scmInfo in ThisBuild := Some(ScmInfo(
+  homepage.value.get,
+  s"scm:git:git@github.com:${organization.value}/${name.value}.git"
+))
 
 sbtPlugin := true
 sbtVersion := "1.0.1"
@@ -35,4 +39,3 @@ releaseEarlyEnableSyncToMaven := false
 
 bintrayReleaseOnPublish := true
 bintrayPackageLabels := Seq("sbt", "sbt-plugin", "publish", "publishing")
-bintrayVcsUrl in ThisBuild := Some(s"https://github.com/${laughedelic}/${name.value}.git")
