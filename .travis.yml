@@ -8,7 +8,7 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION scripted
 after_success:
   - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
-      sbt ++$TRAVIS_SCALA_VERSION releaseEarly
+      sbt ++$TRAVIS_SCALA_VERSION releaseEarly;
     fi
 notifications:
   email: false
