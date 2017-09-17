@@ -1,5 +1,6 @@
 ## sbt-publish-more
 
+[![](https://travis-ci.org/laughedelic/sbt-publish-more.svg)](https://travis-ci.com/laughedelic/sbt-publish-more)
 [![](https://img.shields.io/github/release/laughedelic/sbt-publish-more.svg)](https://github.com/laughedelic/sbt-publish-more/releases/latest)
 [![](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.tldrlegal.com/l/lgpl-3.0)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/laughedelic/sbt-publish-more)
