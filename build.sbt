@@ -35,3 +35,4 @@ releaseEarlyEnableSyncToMaven := false
 
 bintrayReleaseOnPublish := true
 bintrayPackageLabels := Seq("sbt", "sbt-plugin", "publish", "publishing")
+bintrayVcsUrl in ThisBuild := Some(s"https://github.com/${laughedelic}/${name.value}.git")
