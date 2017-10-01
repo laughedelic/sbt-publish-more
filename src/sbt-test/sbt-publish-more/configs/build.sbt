@@ -8,13 +8,10 @@ publishResolvers := Seq(repo1, repo2)
 
 publishMavenStyle := true
 
-// Change publishing to repo2 to ivy-style
-publishCustomConfigs := publishCustomConfigs.value
-  .updated(repo2,
-    publishConfiguration.value
-      // this will make it generate an ivy.xml:
-      .withPublishMavenStyle(false)
-  )
+// Change publishing to repo2 to ivy-style (it will generate an ivy.xml:)
+publishCustomConfigs ++= Map(
+  repo2 -> publishConfiguration.value.withPublishMavenStyle(false)
+)
 
 // just to make the version short:
 version := "1"
