@@ -1,7 +1,11 @@
 > clean
-> publish
+> show publishResolvers
+> show otherResolvers
+> publishAll
+
 $ exists target/repo1/org/configs_2.12/1/configs_2.12-1.pom
 $ exists target/repo1/org/configs_2.12/1/configs_2.12-1.jar
+
 # check that repo2 is ivy-style:
 $ exists target/repo2/org/configs_2.12/1/poms/configs_2.12.pom
 $ exists target/repo2/org/configs_2.12/1/jars/configs_2.12.jar
