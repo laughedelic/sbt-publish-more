@@ -27,15 +27,15 @@ scalacOptions ++= Seq(
   "-Xlint"
 )
 
-ScriptedPlugin.scriptedSettings
+// ScriptedPlugin.scriptedSettings
 scriptedBufferLog := false
 scriptedLaunchOpts ++= Seq(
   "-Xmx1024M",
   s"-Dplugin.version=${version.value}"
 )
 
-releaseEarlyWith := BintrayPublisher
-releaseEarlyEnableSyncToMaven := false
+// releaseEarlyWith := BintrayPublisher
+// releaseEarlyEnableSyncToMaven := false
 
 bintrayReleaseOnPublish := !isSnapshot.value
 bintrayPackageLabels := Seq("sbt", "sbt-plugin", "publish", "publishing")
