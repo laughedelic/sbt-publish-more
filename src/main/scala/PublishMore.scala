@@ -33,7 +33,7 @@ case object PublishMore extends AutoPlugin {
     publishOnlyTo := publishOnlyToTask.evaluated
   )
 
-  def publishAllTask: Def.Initialize[Task[Unit]] = Def.task {
+  def publishTaskDef(resolvers: Seq[Resolver]): Def.Initialize[Task[Unit]] = Def.task {
     val module = ivyModule.value
     val log    = streams.value.log
     val pub    = publisher.value
@@ -41,7 +41,7 @@ case object PublishMore extends AutoPlugin {
     val defaultConfig = publishConfiguration.value
     val customConfigs = publishCustomConfigs.value
 
-    publishResolvers.value.foreach { resolver =>
+    resolvers.foreach { resolver =>
       log.info(s"${BOLD}Publishing to ${resolver.name}${RESET}")
 
       val config = customConfigs.getOrElse(resolver, defaultConfig)
@@ -54,13 +54,14 @@ case object PublishMore extends AutoPlugin {
     }
   }
 
-  def publishOnlyToTask: Def.Initialize[InputTask[Unit]] = Def.inputTask {
-    val resolvers = resolversByName.parsed
-    val log = streams.value.log
-    resolvers.foreach { resolver => log.warn(resolver.toString) }
+  def publishAllTask: Def.Initialize[Task[Unit]] = Def.taskDyn {
+    val resolvers = publishResolvers.value
+    publishTaskDef(resolvers)
+  }
 
-    // TODO
-    // publishWithConfigs(configsMap)
+  def publishOnlyToTask: Def.Initialize[InputTask[Unit]] = Def.inputTaskDyn {
+    val resolvers = resolversByName.parsed
+    publishTaskDef(resolvers)
   }
 
   def resolversByName: Def.Initialize[
