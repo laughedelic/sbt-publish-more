@@ -35,7 +35,9 @@ addSbtPlugin("laughedelic" % "sbt-publish-more" % "<version>")
 #### TL;DR
 
 1. Set `publishResolvers := Seq(...)`
-2. Call `publishAll` task
+2. Publish:
+  * Call `publishAll` to publish to all repositories
+  * Type `publishOnlyTo` and use autocomplete to publish only to the selected ones
 
 ### Multiple publish resolvers
 
