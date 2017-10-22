@@ -1,6 +1,7 @@
 package laughedelic.sbt
 
 import sbt._, Keys._, complete._, DefaultParsers._
+import scala.io.AnsiColor._
 
 case object PublishMore extends AutoPlugin {
 
@@ -8,50 +9,43 @@ case object PublishMore extends AutoPlugin {
 
   case object autoImport {
 
-    lazy val publishConfigs = taskKey[Map[Resolver, PublishConfiguration]]("A set of resolvers with their corresponding publish configurations")
+    lazy val publishResolvers = taskKey[Seq[Resolver]]("A set of resolvers for publishing")
 
+    lazy val publishCustomConfigs = taskKey[Map[Resolver, PublishConfiguration]]("A set of resolvers with their corresponding publish configurations")
+
+    lazy val publishAll = taskKey[Unit]("Publish artifacts using all resolvers from publishResolvers")
     lazy val publishOnlyTo = inputKey[Unit]("Publishes only to the specified repository")
-
-
-    // This adds Resolver.chain(...) constructor
-    implicit def resolverObjOps(resolver: Resolver.type):
-      ResolverOps.type =
-      ResolverOps
-
-    // Allows writing `publishTo := resolver` without explicit `Some(...)`
-    implicit def someResolver(resolver: Resolver):
-      Some[Resolver] =
-      Some(resolver)
   }
   import autoImport._
 
   override def projectSettings = Seq(
-    publishConfigs := Def.task {
-      val config = publishConfiguration.value
+    publishResolvers := Seq(),
 
-      publishTo.value.toSeq
-        .flatMap(resolverAsSeq)
-        .map { resolver =>
-          resolver -> config.withResolverName(resolver.name)
-        }.toMap
-    }.value,
+    // This is important to set the default publishConfiguration
+    publishTo := publishResolvers.value.headOption,
 
-    publish := Def.taskDyn {
-      publishWithConfigs( publishConfigs.value )
-    }.value,
+    // This allows PublishConfiguration to lookup resolver by name
+    otherResolvers ++= publishResolvers.value,
 
+    publishCustomConfigs := Map(),
+
+    publishAll := publishAllTask.value,
     publishOnlyTo := publishOnlyToTask.evaluated
   )
 
-  def publishWithConfigs(configsMap: Map[Resolver, PublishConfiguration]): Def.Initialize[Task[Unit]] = Def.task {
+  def publishAllTask: Def.Initialize[Task[Unit]] = Def.task {
     val module = ivyModule.value
     val log    = streams.value.log
     val pub    = publisher.value
 
-    configsMap.foreach { case (resolver, config) =>
-      log.info(s"\nPublishing to ${resolver.name}")
+    val defaultConfig = publishConfiguration.value
+    val customConfigs = publishCustomConfigs.value
 
-      // Same as `sbt.internal.librarymanagement.IvyActions.publish`
+    publishResolvers.value.foreach { resolver =>
+      log.info(s"${BOLD}Publishing to ${resolver.name}${RESET}")
+
+      val config = customConfigs.getOrElse(resolver, defaultConfig)
+
       pub.publish(
         module,
         config.withResolverName(resolver.name),
@@ -72,8 +66,7 @@ case object PublishMore extends AutoPlugin {
   def resolversByName: Def.Initialize[
     State => Parser[Seq[Resolver]]
   ] = Def.setting { state: State =>
-    val (_, publishToValue) = Project.extract(state).runTask(publishTo, state)
-    val resolvers = publishToValue.toSeq.flatMap(resolverAsSeq)
+    val (_, resolvers) = Project.extract(state).runTask(publishResolvers, state)
 
     def resolverParser(resolver: Resolver): Parser[Resolver] = {
       tokenDisplay(
@@ -92,18 +85,4 @@ case object PublishMore extends AutoPlugin {
     Space ~> repeatDep(chooseNext, Space)
   }
 
-  /** Extracts chained resolvers or just wraps a single one as a Seq */
-  def resolverAsSeq(resolver: Resolver): Seq[Resolver] = resolver match {
-    case chain: ChainedResolver => chain.resolvers
-    case _ => Seq(resolver)
-  }
-
-  case object ResolverOps {
-
-    def chain(resolvers: Resolver*): ChainedResolver =
-      ChainedResolver(
-        s"""Resolver chain: ${resolvers.map(_.name).mkString(", ")}""",
-        resolvers.toVector
-      )
-  }
 }

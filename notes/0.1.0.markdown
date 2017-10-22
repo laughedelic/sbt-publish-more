@@ -1,0 +1,3 @@
+This is the first public release, it allows you to
+* publish artifacts to several repositories
+* set different publish configurations for each repository
