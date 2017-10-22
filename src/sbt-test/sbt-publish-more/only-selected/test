@@ -1,3 +1,6 @@
+> completions publishOnlyTo re
+-> publishOnlyTo foo
+
 > publishOnlyTo repo2 repo4
 
 $ exists target/repo2/org/simple_2.12/1/simple_2.12-1.pom
