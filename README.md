@@ -28,7 +28,7 @@ addSbtPlugin("laughedelic" % "sbt-publish-more" % "<version>")
 
 (see the latest release version on the badge above)
 
-> **Requirements:** This plugins requires at least sbt 1.0.
+> **Requirements:** This plugins requires sbt 1.x
 
 > **NOTE:** This plugin is in active development, so things are likely to change. Check [release notes](https://github.com/laughedelic/sbt-publish-more/releases) and usage section in the Readme every time you update to a new version.
 
@@ -39,7 +39,7 @@ addSbtPlugin("laughedelic" % "sbt-publish-more" % "<version>")
 
 ### Multiple publish resolvers
 
-If you want to publish to several repositories you just need to set the `publishTo` setting to a resolver chain. For the example from above it will look like this:
+If you want to publish to several repositories you just need to set the `publishResolvers` setting. For the example from above it will look like this:
 
 ```scala
 publishResolvers := Seq(
@@ -53,7 +53,7 @@ See [sbt documentation][resolvers-docs] for more types of resolvers.
 
 Setting `publishResolvers` will also set `publishTo` to the first resolver in the list.
 
-Now you can call `publishAll` task to publish to every resolver in the `publishResolvers` list. Note that if you want it to be the default behaviour, you should change the standard `publish` task:
+Now you can call `publishAll` task to publish to every resolver in the `publishResolvers` list. Note that if you want it to be the default behavior, you should change the standard `publish` task:
 
 ```scala
 publish := publishAll.value
@@ -64,7 +64,7 @@ publish := publishAll.value
 
 By default it will publish to each repository with the same default publish configuration (that is stored in the [`publishConfiguration`][default-publish-configuration] setting), as if you would call normal `publish` task several times while manually changing `publishTo` setting.
 
-But you may want to publish to _different repositories with different configurations_. For example, maven-style vs. ivy-style patterns, or different sets of artifacts. So this plugins adds a setting `publishCustomConfigs`, which stores a mapping of `Resolver`s to their corresponding [`PublishConfiguration`]s.
+But you may want to publish to _different repositories with different configurations_. For example, maven-style vs. ivy-style patterns, or different sets of artifacts. So this plugin adds a setting `publishCustomConfigs`, which stores a mapping of `Resolver`s to their corresponding [`PublishConfiguration`]s.
 
 Say you want to publish to one repository maven-style (default) and to the other ivy-style. First, you should define your publish resolvers (in `build.sbt`):
 
@@ -72,7 +72,7 @@ Say you want to publish to one repository maven-style (default) and to the other
 lazy val repo1 = Resolver.file("repo1",  file("example/repo1"))
 lazy val repo2 = Resolver.file("repo2",  file("example/repo2"))(Resolver.ivyStylePatterns)
 
-publishTo := Resolver.chain(repo1, repo2)
+publishResolvers := Seq(repo1, repo2)
 ```
 
 It's better to define values for resolvers, because we will need to refer to them in the next step. The second one needs explicit ivy-style patterns, because the default is maven-style.
