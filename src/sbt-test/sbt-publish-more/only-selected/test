@@ -1,0 +1,17 @@
+> completions publishOnlyTo re
+-> publishOnlyTo foo
+
+> publishOnlyTo repo2 repo4
+
+$ exists target/repo2/org/simple_2.12/1/simple_2.12-1.pom
+$ exists target/repo2/org/simple_2.12/1/simple_2.12-1.jar
+
+$ exists target/repo4/org/simple_2.12/1/simple_2.12-1.pom
+$ exists target/repo4/org/simple_2.12/1/simple_2.12-1.jar
+
+# shouldn't publish to repo1 and repo3
+$ absent target/repo1/org/simple_2.12/1/simple_2.12-1.pom
+$ absent target/repo1/org/simple_2.12/1/simple_2.12-1.jar
+
+$ absent target/repo3/org/simple_2.12/1/simple_2.12-1.pom
+$ absent target/repo3/org/simple_2.12/1/simple_2.12-1.jar
