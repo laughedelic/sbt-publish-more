@@ -1,0 +1,9 @@
+> clean
+> show publishResolvers
+> publishAll
+
+$ absent target/repo1/org/skip_2.12/1/skip_2.12-1.pom
+$ absent target/repo1/org/skip_2.12/1/skip_2.12-1.jar
+
+$ absent target/repo2/org/skip_2.12/1/skip_2.12-1.pom
+$ absent target/repo2/org/skip_2.12/1/skip_2.12-1.jar

@@ -35,21 +35,27 @@ case object PublishMore extends AutoPlugin {
     val module = ivyModule.value
     val log    = streams.value.log
     val pub    = publisher.value
+    val ref    = thisProjectRef.value
 
     val defaultConfig = publishConfiguration.value
     val customConfigs = publishCustomConfigs.value
 
-    publishResolvers.value.foreach { resolver =>
-      log.info(s"${BOLD}Publishing to ${resolver.name}${RESET}")
+    val skipPublish = ((skip in publish) ?? false).value
 
-      val config = customConfigs.getOrElse(resolver, defaultConfig)
+    if (skipPublish) {
+      log.info(s"${BOLD}Skipping publish for ${ref.project}${RESET}")
+    } else {
+      publishResolvers.value.foreach { resolver =>
+        log.info(s"${BOLD}Publishing to ${resolver.name}${RESET}")
 
-      pub.publish(
-        module,
-        config.withResolverName(resolver.name),
-        log
-      )
+        val config = customConfigs.getOrElse(resolver, defaultConfig)
+
+        pub.publish(
+          module,
+          config.withResolverName(resolver.name),
+          log
+        )
+      }
     }
   }
-
 }
