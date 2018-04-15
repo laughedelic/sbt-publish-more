@@ -28,8 +28,19 @@ case object PublishMore extends AutoPlugin {
 
     publishCustomConfigs := Map(),
 
-    publishAll := publishAllTask.value
+    publishAll := publishAllNotSkippedTask.value
   )
+
+  private def publishAllNotSkippedTask: Def.Initialize[Task[Unit]] =
+    Def.taskDyn {
+      val log    = streams.value.log
+      val sk = ((skip in publish) ?? false).value
+      val ref = thisProjectRef.value
+      if (sk) Def.task {
+        log.info(s"${BOLD}Skipping publish for ${ref.project}${RESET}")
+      }
+      else publishAllTask
+    }
 
   def publishAllTask: Def.Initialize[Task[Unit]] = Def.task {
     val module = ivyModule.value

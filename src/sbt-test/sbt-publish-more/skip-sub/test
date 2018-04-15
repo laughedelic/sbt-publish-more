@@ -1,0 +1,19 @@
+> clean
+> show publishResolvers
+> project sub1
+> publishAll
+> project sub2
+> publishAll
+
+$ absent target/repo1/org/skip-sub1_2.12/1/skip-sub1_2.12-1.pom
+$ absent target/repo1/org/skip-sub1_2.12/1/skip-sub1_2.12-1.jar
+
+$ absent target/repo2/org/skip-sub1_2.12/1/skip-sub1_2.12-1.pom
+$ absent target/repo2/org/skip-sub1_2.12/1/skip-sub1_2.12-1.jar
+
+$ exists target/repo1/org/skip-sub2_2.12/1/skip-sub2_2.12-1.pom
+$ exists target/repo1/org/skip-sub2_2.12/1/skip-sub2_2.12-1.jar
+
+$ exists target/repo2/org/skip-sub2_2.12/1/skip-sub2_2.12-1.pom
+$ exists target/repo2/org/skip-sub2_2.12/1/skip-sub2_2.12-1.jar
+
